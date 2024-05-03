@@ -1,3 +1,5 @@
+import { Pause } from "lucide-react";
+
 export default function Button({
   bg,
   icon,
@@ -53,16 +55,20 @@ export function IconButton({ icon, onClick, type }) {
   );
 }
 
-export function MenuIcon({ icon, type, form, display, onClick }) {
+export function MenuIcon({ icon, activeAudio, audioId, type, show, form, display, color, onClick }) {
   return (
     <>
       <button
         form={form}
         type={type}
         onClick={onClick}
-        className={`${display} bg-beige transition-all hover:shadow-none duration-500 w-fit rounded-full p-2 border border-brown shadow-button`}
+        className={`${display} ${show === false && "hidden"} ${color ? color : "bg-beige"} transition-all hover:shadow-none duration-500 w-fit rounded-full p-2 border border-brown shadow-button`}
       >
-        {icon}
+        {activeAudio ? (
+          <Pause />
+        ) : (
+          icon
+        )}
       </button>
     </>
   );

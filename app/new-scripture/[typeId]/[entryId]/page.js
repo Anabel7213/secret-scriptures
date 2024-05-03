@@ -15,10 +15,19 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { Disc3, Lightbulb, Save } from "lucide-react";
+import {
+  AudioLines,
+  Bird,
+  Disc3,
+  Drum,
+  Lightbulb,
+  Save,
+  Shrub,
+  Waves,
+} from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function NewEntry() {
@@ -146,14 +155,97 @@ export default function NewEntry() {
       setTitle(randomPrompt?.prompt);
     }
   };
+  const [displaySounds, setDisplaySounds] = useState(false);
+  const [activeAudio, setActiveAudio] = useState(null);
+  const audioRefs = useRef({});
   const actionButtons = [
-    {
-      icon: <Disc3 />,
-      onClick: () => {},
-    },
     {
       icon: <Lightbulb />,
       onClick: insertRandomPrompt,
+    },
+    {
+      icon: <Disc3 />,
+      onClick: () => setDisplaySounds((prev) => !prev),
+    },
+    {
+      type: "audio",
+      audioId: 1,
+      icon: <Bird />,
+      display: displaySounds,
+      color: "bg-[#fef0e1]",
+      onClick: () => {
+        if (activeAudio === 1) {
+          setActiveAudio(null);
+          new Audio("/sounds/birds.mp3").pause();
+        } else {
+          setActiveAudio(1);
+          new Audio("/sounds/birds.mp3").play();
+        }
+      },
+    },
+    {
+      type: "audio",
+      audioId: 2,
+      icon: <Shrub />,
+      display: displaySounds,
+      color: "bg-[#fef0e1]",
+      onClick: () => {
+        if (activeAudio === 2) {
+          setActiveAudio(null);
+          new Audio("/sounds/forest.mp3").pause();
+        } else {
+          setActiveAudio(2);
+          new Audio("/sounds/forest.mp3").play();
+        }
+      },
+    },
+    {
+      type: "audio",
+      audioId: 3,
+      icon: <AudioLines />,
+      display: displaySounds,
+      color: "bg-[#fef0e1]",
+      onClick: () => {
+        if (activeAudio === 3) {
+          setActiveAudio(null);
+          new Audio("/sounds/mantra.mp3").pause();
+        } else {
+          setActiveAudio(3);
+          new Audio("/sounds/mantra.mp3").play();
+        }
+      },
+    },
+    {
+      type: "audio",
+      audioId: 4,
+      icon: <Waves />,
+      display: displaySounds,
+      color: "bg-[#fef0e1]",
+      onClick: () => {
+        if (activeAudio === 4) {
+          setActiveAudio(null);
+          new Audio("/sounds/ocean.mp3").pause();
+        } else {
+          setActiveAudio(4);
+          new Audio("/sounds/ocean.mp3").play();
+        }
+      },
+    },
+    {
+      type: "audio",
+      audioId: 5,
+      icon: <Drum />,
+      display: displaySounds,
+      color: "bg-[#fef0e1]",
+      onClick: () => {
+        if (activeAudio === 5) {
+          setActiveAudio(null);
+          new Audio("/sounds/tibetan.mp3").pause();
+        } else {
+          setActiveAudio(5);
+          new Audio("/sounds/tibetan.mp3").play();
+        }
+      },
     },
     {
       icon: <Save />,
@@ -177,11 +269,14 @@ export default function NewEntry() {
           <div className="flex gap-4 absolute bottom-[-22px] left-[16px] md:left-[48px] lg:left-[20%]">
             {actionButtons.map((button, i) => (
               <MenuIcon
+                activeAudio={button.audioId === activeAudio}
                 form={button.form}
                 type={button.type}
                 key={i}
                 onClick={button.onClick}
                 icon={button.icon}
+                show={button.display}
+                color={button.color}
               />
             ))}
           </div>

@@ -66,6 +66,17 @@ export default function Login() {
       }
     } catch(err) {
       console.error("Error logging in:" + err)
+      toast.error("Wrong password or email!", {
+        style: {
+          border: '1px solid #8D674F',
+          padding: '16px',
+          color: '#8D674F',
+          backgroundColor: "#F0D0B7"
+        },
+        iconTheme: {
+          primary: '#8D674F',
+          secondary: '#F0D0B7',
+        }})
     } finally {
       setLoading(false)
     }
