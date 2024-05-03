@@ -80,7 +80,6 @@ export default function MyScriptures() {
     <>
       <div className="text-brown">
         <Header />
-        <button onClick={() => console.log(user.id)}>test</button>
         <div className="inset-0 flex flex-col gap-4 justify-center mx-4 my-16">
           <h1 className="text-[48px] font-spicy-rice">My Scriptures</h1>
           {isLoading ? (
