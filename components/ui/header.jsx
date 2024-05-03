@@ -1,13 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { MenuIcon } from "./button";
-import { DoorOpen, Menu, NotebookText } from "lucide-react";
+import { DoorOpen, Menu, NotebookText, PencilLine } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import Popup from "./popup";
+import { useState } from "react";
 
 export default function Header() {
+  const pathname = usePathname()
   const router = useRouter();
   const handleLogout = async () => {
     try {
@@ -31,6 +34,7 @@ export default function Header() {
       console.error("Error logging out:" + err);
     }
   };
+  const [ open, setOpen ] = useState(false)
   return (
     <>
       <div className="">
@@ -49,15 +53,21 @@ export default function Header() {
               icon={<NotebookText />}
               display="group-hover:block hidden"
             />
-            <MenuIcon onClick={() => {}} icon={<Menu />} />
+            <MenuIcon icon={<Menu />} />
           </div>
-          <MenuIcon
-            onClick={handleLogout}
-            icon={<DoorOpen />}
-            display="group-hover:block hidden"
-          />
+          <div className="flex gap-4">
+            <MenuIcon onClick={() => router.push(`/`)} icon={<PencilLine />} display={pathname === "/" ? "hidden" : "group-hover:block hidden"} />
+            <MenuIcon
+              onClick={() => setOpen(true)}
+              icon={<DoorOpen />}
+              display="group-hover:block hidden"
+            />
+          </div>
         </div>
       </div>
+      {open && (
+        <Popup onCancel={() => setOpen(false)} onConfirm={handleLogout} onClose={() => setOpen(false)} title="Log out?" desc="You're about to log out. If you do, next time you'll have to log in again." />
+      )}
     </>
   );
 }

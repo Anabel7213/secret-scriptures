@@ -1,9 +1,17 @@
 "use client";
 
 import Header from "@/components/ui/header";
+import Placeholder from "@/components/ui/placeholder";
+import Popup from "@/components/ui/popup";
 import { db } from "@/firebaseConfig";
 import axios from "axios";
-import { collection, deleteDoc, doc, getDocs, where } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import { BookOpen, Eraser } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -11,6 +19,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function MyScriptures() {
+  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState();
   useEffect(() => {
     const getUser = async () => {
@@ -23,66 +32,120 @@ export default function MyScriptures() {
   useEffect(() => {
     const fetchEntries = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "entries"), where("user", "==", user?.id))
+        const querySnapshot = await getDocs(
+          collection(db, "entries"),
+          where("user", "==", user?.id)
+        );
         const entries = querySnapshot.docs.map((doc) => ({
-            ...doc.data()
-        }))
-        setEntries(entries)
+          ...doc.data(),
+        }));
+        setEntries(entries);
+        setIsLoading(false);
       } catch (err) {
         console.log(err);
       }
     };
-    fetchEntries()
+    fetchEntries();
   }, [user?.id]);
-  const router = useRouter()
-  const handleDeleteEntry = async (id) => {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [id, setId] = useState();
+  const handleDeleteEntry = async (uid) => {
     try {
-        await deleteDoc(doc(db, "entries", id))
-        console.log(id)
+      const querySnapshot = await getDocs(
+        query(collection(db, "entries"), where("uid", "==", uid))
+      );
+      if (!querySnapshot.empty) {
+        const docToDelete = querySnapshot.docs[0];
+        await deleteDoc(docToDelete.ref);
         toast.success("Deleted!", {
-            style: {
-              border: "1px solid #8D674F",
-              padding: "16px",
-              color: "#8D674F",
-              backgroundColor: "#F0D0B7",
-            },
-            iconTheme: {
-              primary: "#8D674F",
-              secondary: "#F0D0B7",
-            },
-          });
-        console.log("Document successfully deleted")
-    } catch(err) {
-        console.log("Failed to delete document", err)
+          style: {
+            border: "1px solid #8D674F",
+            padding: "16px",
+            color: "#8D674F",
+            backgroundColor: "#F0D0B7",
+          },
+          iconTheme: {
+            primary: "#8D674F",
+            secondary: "#F0D0B7",
+          },
+        });
+        console.log("Document deleted with uid:", uid);
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        console.log("No document found with uid:", uid);
+      }
+    } catch (err) {
+      console.error("Failed to delete document:", err);
     }
-  }
+  };
   return (
     <>
       <div className="text-brown">
         <Header />
-        <div className="inset-0 flex flex-col gap-4 justify-center md:items-center h-screen mx-4">
-          <h1 className="text-[48px] font-spicy-rice md:text-center">
-            My Scriptures
-          </h1>
-          <div className="flex gap-4 flex-wrap">
-          {entries?.map((entry) => (
-            <div key={entry.id} className="flex flex-col w-full md:w-[324px]">
-                <Image priority src={`/${entry.pathname}.webp`} alt="Cover image" width={324} height={200} className="w-full h-[124px] object-cover rounded-t-[16px] border border-brown"/>
-                <div className="border p-4 rounded-b-[16px] border-brown">
-                    <h1 className="text-lg">{entry.title}</h1>
+        {/* <button onClick={() => console.log()}>test</button> */}
+        <div className="inset-0 flex flex-col gap-4 justify-center mx-4 my-16">
+          <h1 className="text-[48px] font-spicy-rice">My Scriptures</h1>
+          {isLoading ? (
+            <Placeholder />
+          ) : (
+            <div className="flex gap-4 flex-wrap">
+              {entries?.map((entry) => (
+                <div
+                  key={entry.uid}
+                  className="flex flex-col w-full md:w-[324px]"
+                >
+                  <Image
+                    priority
+                    src={`/${entry.pathname}.webp`}
+                    alt="Cover image"
+                    width={324}
+                    height={200}
+                    className="w-full h-[124px] object-cover rounded-t-[16px] border border-brown"
+                  />
+                  <div className="border p-4 rounded-b-[16px] border-brown">
+                    <h1 className="text-lg">
+                      {entry.title.length > 32
+                        ? entry.title.slice(0, 32) + "..."
+                        : entry.title}
+                    </h1>
                     <div className="flex justify-between gap-4">
-                        <span className="text-sm text-brown/50">{entry.date}</span>
-                        <div className="flex gap-2">
-                            <button onClick={() => router.push(`/new-scripture/${entry.pathname}/${entry.id}`)}><BookOpen /></button>
-                            <button onClick={() => handleDeleteEntry(entry.id)}><Eraser /></button>
-                        </div>
+                      <span className="text-sm text-brown/50">
+                        {entry.date}
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() =>
+                            router.push(
+                              `/new-scripture/${entry.pathname}/${entry.uid}`
+                            )
+                          }
+                        >
+                          <BookOpen />
+                        </button>
+                        <button
+                          onClick={() => (setOpen(true), setId(entry.uid))}
+                        >
+                          <Eraser />
+                        </button>
+                      </div>
                     </div>
+                  </div>
                 </div>
+              ))}
             </div>
-          ))}
-          </div>
+          )}
         </div>
       </div>
+      {open && (
+        <Popup
+          onCancel={() => setOpen(false)}
+          onConfirm={() => handleDeleteEntry(id)}
+          onClose={() => setOpen(false)}
+          title="Are you sure?"
+          desc="Once you delete it it's gone forever."
+        />
+      )}
     </>
   );
 }

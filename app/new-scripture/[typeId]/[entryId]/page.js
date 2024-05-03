@@ -38,63 +38,68 @@ export default function NewEntry() {
   }, []);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  //create or update
   const onSubmit = async (e) => {
     e.preventDefault();
-    const entry = {
-      user: user.id, //link to user
-      id: pathname.split("/")[3],
+    const data = {
+      user: user.id,
+      uid: pathname.split("/")[3],
       pathname: pathname.split("/")[2],
       date: date,
       title: title,
       body: body,
     };
     try {
-      const entryRef = doc(db, "entries", entry.id);
-      const entryDocSnapshot = await getDoc(entryRef);
-      if (entryDocSnapshot.exists()) {
-        console.log("The document already exists in the database");
-        try {
-          await updateDoc(entryRef, entry);
-          // await setDoc(doc(db, "entries"), entry, {merge: true})
-          toast.success("Updated!", {
-            style: {
-              border: "1px solid #8D674F",
-              padding: "16px",
-              color: "#8D674F",
-              backgroundColor: "#F0D0B7",
-            },
-            iconTheme: {
-              primary: "#8D674F",
-              secondary: "#F0D0B7",
-            },
-          });
-          console.log("Document successfully updated");
-        } catch (err) {
-          console.log("Failed to update document", err);
-        }
+      const q = query(
+        collection(db, "entries"),
+        where("uid", "==", pathname.split("/")[3])
+      );
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) {
+        await addDoc(collection(db, "entries"), data);
+        toast.success("Saved!", {
+          style: {
+            border: "1px solid #8D674F",
+            padding: "16px",
+            color: "#8D674F",
+            backgroundColor: "#F0D0B7",
+          },
+          iconTheme: {
+            primary: "#8D674F",
+            secondary: "#F0D0B7",
+          },
+        });
+        console.log("Successfully added");
       } else {
-        console.log("The document does not exist in the database");
-        try {
-          await addDoc(collection(db, "entries"), entry);
-          toast.success("Saved!", {
-            style: {
-              border: "1px solid #8D674F",
-              padding: "16px",
-              color: "#8D674F",
-              backgroundColor: "#F0D0B7",
-            },
-            iconTheme: {
-              primary: "#8D674F",
-              secondary: "#F0D0B7",
-            },
-          });
-          console.log("Document successfully created");
-        } catch (err) {
-          console.log("Failed to create document", err);
-        }
+        await updateDoc(querySnapshot.docs[0].ref, data);
+        toast.success("Updated!", {
+          style: {
+            border: "1px solid #8D674F",
+            padding: "16px",
+            color: "#8D674F",
+            backgroundColor: "#F0D0B7",
+          },
+          iconTheme: {
+            primary: "#8D674F",
+            secondary: "#F0D0B7",
+          },
+        });
+        console.log("Successfully updated");
       }
     } catch (err) {
-      console.log("Error saving the document", err);
+      toast.error("Oops...Try again!", {
+        style: {
+          border: "1px solid #8D674F",
+          padding: "16px",
+          color: "#8D674F",
+          backgroundColor: "#F0D0B7",
+        },
+        iconTheme: {
+          primary: "#8D674F",
+          secondary: "#F0D0B7",
+        },
+      });
+      console.log("Error saving the document:", err);
     }
   };
   const [isTyped, setTyped] = useState(true);
@@ -103,24 +108,34 @@ export default function NewEntry() {
     setTyped(true);
   };
   const [currentEntry, setCurrentEntry] = useState(null);
+  //fetch
   useEffect(() => {
-    const fetchEntry = async () => {
-      if (user) {
-        const entryDocRef = doc(db, "entries", pathname.split("/")[3])
-        const entryDocSnap = await getDoc(entryDocRef)
-        if(entryDocSnap.exists()) {
-          setCurrentEntry({
-            id: pathname.split("/")[3],
-            ...entryDocSnap.data()
-          })
+    const fetchCurrentEntry = async () => {
+      try {
+        const querySnapshot = await getDocs(
+          query(
+            collection(db, "entries"),
+            where("uid", "==", pathname.split("/")[3])
+          )
+        );
+
+        if (!querySnapshot.empty) {
+          const docs = querySnapshot.docs.map((doc) => doc.data());
+          setCurrentEntry(docs[0]);
+        } else {
+          console.log("Document does not exist");
         }
+      } catch (err) {
+        console.error("Error fetching document:", err);
       }
     };
-    fetchEntry();
-  }, [user, pathname]);
+
+    fetchCurrentEntry();
+  }, [pathname]);
   const categoryFilteredPrompts = prompts?.filter(
     (prompt) => prompt.category === pathname.split("/")[2]
   );
+  //generate a prompt
   const insertRandomPrompt = () => {
     setTyped(false);
     const random = Math.floor(Math.random() * categoryFilteredPrompts?.length);
@@ -149,7 +164,6 @@ export default function NewEntry() {
   return (
     <>
       <div className="text-brown">
-        {/* <button onClick={() => console.log(currentEntry)}>test</button> */}
         <Header />
         <div className="relative">
           <Image
@@ -176,7 +190,7 @@ export default function NewEntry() {
           <span className="opacity-50 font-spicy-rice">{date}</span>
           <form id="entry" onSubmit={onSubmit} className="w-full h-screen mb-4">
             <input
-              value={title}
+              value={title || currentEntry?.title}
               onChange={handleTitleChange}
               name="title"
               type="text"
@@ -184,7 +198,7 @@ export default function NewEntry() {
               className="font-spicy-rice text-[32px] md:text-[48px] lg:text-[64px] bg-transparent outline-none placeholder:text-brown/30 w-full"
             />
             <textarea
-              value={body}
+              value={body || currentEntry?.body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="Play some ambient sounds and just let your mind wander. Feeling Stuck? Hit the button to generate a prompt..."
               className="resize-none bg-transparent outline-none h-full placeholder:text-brown/30 w-full"
