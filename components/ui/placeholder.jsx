@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 export default function Placeholder() {
   const [ user, setUser ] = useState()
-  const [ numberOfEntries, setNumberOfEntries ] = useState(4)
+  const [ numberOfEntries, setNumberOfEntries ] = useState(0)
   useEffect(() => {
     const fetchEntries = async () => {
       const response = await axios.get("/api/user")

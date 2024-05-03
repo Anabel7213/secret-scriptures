@@ -101,8 +101,8 @@ export default function MyScriptures() {
                   />
                   <div className="border p-4 rounded-b-[16px] border-brown">
                     <h1 className="text-lg">
-                      {entry.title.length > 32
-                        ? entry.title.slice(0, 32) + "..."
+                      {entry.title.length > 24
+                        ? entry.title.slice(0, 24) + "..."
                         : entry.title}
                     </h1>
                     <div className="flex justify-between gap-4">
