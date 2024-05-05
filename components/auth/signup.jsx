@@ -96,7 +96,7 @@ export default function SignUp() {
   };
   return (
     <>
-      <div className="flex flex-col gap-4 text-brown">
+      <div className="flex flex-col gap-4 text-brown w-full md:w-fit px-4">
         <h1 className="text-[48px] font-spicy-rice text-center">
           Joining? Awesome!
         </h1>

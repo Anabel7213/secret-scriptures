@@ -264,7 +264,7 @@ export default function NewEntry() {
             alt="Cover"
             height={300}
             width={1900}
-            className="border-b border-brown"
+            className="border-b border-brown h-[200px] md:h-auto object-cover md:object-fill"
           />
           <div className="flex gap-4 absolute bottom-[-22px] left-[16px] md:left-[48px] lg:left-[20%]">
             {actionButtons.map((button, i) => (
@@ -281,9 +281,9 @@ export default function NewEntry() {
             ))}
           </div>
         </div>
-        <div className="flex flex-col mt-10 mx-[16px] md:mx-[48px] lg:mx-[20%]">
+        <div className="flex flex-col mt-10 mx-[16px] md:mx-[48px] lg:mx-[20%] pb-16">
           <span className="opacity-50 font-spicy-rice">{date}</span>
-          <form id="entry" onSubmit={onSubmit} className="w-full h-screen mb-4">
+          <form id="entry" onSubmit={onSubmit} className="w-full h-screen">
             <input
               value={title || currentEntry?.title}
               onChange={handleTitleChange}
@@ -296,7 +296,7 @@ export default function NewEntry() {
               value={body || currentEntry?.body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="Play some ambient sounds and just let your mind wander. Feeling Stuck? Hit the button to generate a prompt..."
-              className="resize-none bg-transparent outline-none h-full placeholder:text-brown/30 w-full"
+              className="resize-none bg-transparent outline-none h-full scroll placeholder:text-brown/30 w-full"
             />
           </form>
         </div>

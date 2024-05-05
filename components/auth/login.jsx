@@ -83,7 +83,7 @@ export default function Login() {
   };
   return (
     <>
-      <div className="text-brown flex flex-col gap-4">
+      <div className="text-brown flex flex-col gap-4 w-full md:w-fit px-4">
         <h1 className="text-[48px] font-spicy-rice text-center">
           Welcome <br /> back, mate!
         </h1>

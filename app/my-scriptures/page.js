@@ -80,7 +80,7 @@ export default function MyScriptures() {
     <>
       <div className="text-brown">
         <Header />
-        <div className="inset-0 flex flex-col gap-4 justify-center mx-4 my-16">
+        <div className="inset-0 flex flex-col gap-4 justify-center mx-4 my-16 pb-16">
           <h1 className="text-[48px] font-spicy-rice">My Scriptures</h1>
           {isLoading ? (
             <Placeholder />

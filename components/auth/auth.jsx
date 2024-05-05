@@ -29,7 +29,7 @@ export default function Auth() {
   ];
   return (
     <>
-      <div className="flex flex-col gap-4 items-center text-brown">
+      <div className="flex flex-col gap-4 items-center text-brown px-4">
         <span>{date}</span>
         <h1 className="text-[48px] font-spicy-rice text-center capitalize">
           My secret <br /> scriptures.

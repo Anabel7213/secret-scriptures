@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { MenuIcon } from "./button";
-import { DoorOpen, Menu, NotebookText, PencilLine } from "lucide-react";
+import { DoorOpen, Feather, Menu, NotebookText, PencilLine } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -38,15 +38,16 @@ export default function Header() {
   return (
     <>
       <div className="">
-        <Image
+        <Feather onClick={() => router.push("/")} size={32} className={`absolute ${pathname.includes("/new-scripture") ? "text-lightBrown" : "text-brown"} z-10 top-4 left-4 cursor-pointer`} />
+        {/* <Image
           onClick={() => router.push("/")}
           src="/logo.svg"
           alt="Logo"
-          width={64}
-          height={64}
+          width={32}
+          height={32}
           className="absolute z-10 top-4 left-4 cursor-pointer"
-        />
-        <div className="absolute w-fit z-10 top-4 right-4 flex flex-col items-end gap-4 group">
+        /> */}
+        <div className="absolute text-brown w-fit z-10 top-4 right-4 flex flex-col items-end gap-4 group">
           <div className="flex gap-4">
             <MenuIcon
               onClick={() => router.push("/my-scriptures")}

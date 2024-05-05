@@ -33,7 +33,7 @@ export function SubtleButton({ cta, onClick, type }) {
       <button
         type={type}
         onClick={onClick}
-        className="hover:underline transition-all duration-500"
+        className="hover:underline text-brown transition-all duration-500"
       >
         {cta}
       </button>
@@ -62,7 +62,7 @@ export function MenuIcon({ icon, activeAudio, audioId, type, show, form, display
         form={form}
         type={type}
         onClick={onClick}
-        className={`${display} ${show === false && "hidden"} ${color ? color : "bg-beige"} transition-all hover:shadow-none duration-500 w-fit rounded-full p-2 border border-brown shadow-button`}
+        className={`${display} ${show === false && "hidden"} ${color ? color : "bg-beige"} transition-all hover:shadow-none duration-500 w-fit rounded-full p-2 border border-brown text-brown shadow-button`}
       >
         {activeAudio ? (
           <Pause />
