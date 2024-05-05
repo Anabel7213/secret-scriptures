@@ -21,29 +21,36 @@ import toast from "react-hot-toast";
 export default function MyScriptures() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [entries, setEntries] = useState();
+  const [entries, setEntries] = useState([]);
   useEffect(() => {
     const fetchEntries = async () => {
-      const response = await axios.get("/api/user");
-      setUser(response.data.data)
-      if(user !== null) {
-        try {
+      try {
+        const response = await axios.get("/api/user");
+        setUser(response.data.data);
+
+        if (response.data.data) {
           const querySnapshot = await getDocs(
-            collection(db, "entries"),
-            where("user", "==", user?.id)
+            query(
+              collection(db, "entries"),
+              where("user", "==", response.data.data.id)
+            )
           );
+
           const entries = querySnapshot.docs.map((doc) => ({
             ...doc.data(),
           }));
+
           setEntries(entries);
-          setIsLoading(false);
-        } catch (err) {
-          console.log(err);
         }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
+
     fetchEntries();
-  }, [user]);
+  }, []);
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [id, setId] = useState();
@@ -81,7 +88,13 @@ export default function MyScriptures() {
       <div className="text-brown">
         <Header />
         <div className="inset-0 flex flex-col gap-4 justify-center mx-4 my-16 pb-16">
-          <h1 className="text-[48px] font-spicy-rice">My Scriptures</h1>
+          <h1 className="text-[48px] leading-none font-spicy-rice">My Scriptures</h1>
+          {!entries.length > 0 && (
+            <>
+            <p className="opacity-50">Your journal entries will appear here.</p>
+            <Placeholder />
+            </>
+          )}
           {isLoading ? (
             <Placeholder />
           ) : (
